@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ультимативный Техно-Сканер ПК v5</title>
+  <style>
+    body{background-color:#08080a;color:#ffffff;font-family:'Segoe UI',system-ui,sans-serif;margin:0;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh;box-sizing:border-box;background-image:radial-gradient(circle at 50% 50%,#14151b 0%,#08080a 100%)}
+    .app-container{display:flex;gap:24px;width:100%;max-width:1400px;perspective:1000px}
+    .box{background:rgba(19,19,22,0.7);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);padding:28px;border-radius:20px;border:2px solid rgba(38,38,43,0.6);box-shadow:0 20px 40px rgba(0,0,0,0.6);transition:all .5s cubic-bezier(0.4,0,0.2,1)}
+    .box:hover{transform:translateY(-4px)}
+    .center-column{width:360px;flex-shrink:0;text-align:center;position:relative}
+    .side-column{flex-grow:1;flex-basis:0}
+    .theme-trash .box{border-color:rgba(238,82,83,0.8);box-shadow:0 0 30px rgba(238,82,83,0.15)}
+    .theme-cyber .box{border-color:rgba(16,172,132,0.8);box-shadow:0 0 35px rgba(16,172,132,0.2)}
+    .theme-normal .box{border-color:rgba(0,118,255,0.8);box-shadow:0 0 30px rgba(0,118,255,0.15)}
+    h2{margin-top:0;margin-bottom:24px;font-size:1.4rem;font-weight:600;display:flex;align-items:center;gap:10px;justify-content:center}
+    .side-column h2{justify-content:flex-start}
+    .input-wrapper{position:relative;margin:18px 0}
+    input{width:100%;padding:14px 16px;background:rgba(28,28,33,0.8);border:1px solid rgba(45,45,53,0.8);border-radius:10px;color:white;box-sizing:border-box;font-size:0.95rem;transition:all .3s ease}
+    input:focus{outline:none;border-color:#0076ff;background:#1c1c21;box-shadow:0 0 12px rgba(0,118,255,0.3)}
+    .suggestions-box{position:absolute;top:100%;left:0;right:0;background:#16161a;border:2px solid #0076ff;border-radius:12px;margin-top:8px;padding:6px 0;z-index:999;display:none;text-align:left;max-height:240px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,118,255,0.25);animation:fadeInUp .3s cubic-bezier(0.18,0.89,0.32,1.28)}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    .suggestions-box::-webkit-scrollbar{width:6px}
+    .suggestions-box::-webkit-scrollbar-thumb{background:#2d2d35;border-radius:10px}
+    .suggestions-box::-webkit-scrollbar-thumb:hover{background:#0076ff}
+    .suggestion-item{padding:12px 18px;cursor:pointer;border-bottom:1px solid rgba(38,38,43,0.4);transition:all .2s ease}
+    .suggestion-item:last-child{border:none}
+    .suggestion-item:hover{background:rgba(38,38,43,0.8);padding-left:22px}
+    .asst-header{font-size:0.7rem;color:#0076ff;text-transform:uppercase;font-weight:bold;letter-spacing:1px;margin-bottom:3px}
+    .asst-name{font-size:0.95rem;font-weight:bold;color:#ffffff}
+    .asst-badge{display:inline-block;font-size:0.7rem;padding:3px 8px;border-radius:6px;margin-top:6px;background:#0b0b0d;color:#10ac84;font-weight:bold}
+    button{width:100%;padding:16px;background:linear-gradient(135deg,#0076ff 0%,#0056b3 100%);border:none;border-radius:10px;color:white;font-weight:bold;font-size:1rem;cursor:pointer;margin-top:15px;box-shadow:0 4px 15px rgba(0,118,255,0.3);transition:all .3s ease}
+    button:hover{transform:scale(1.02);box-shadow:0 6px 20px rgba(0,118,255,0.5)}
+    .v-section{background:rgba(28,28,33,0.5);border:1px solid rgba(45,45,53,0.4);padding:16px 18px;border-radius:12px;margin-bottom:14px;text-align:left;transition:all .3s ease}
+    .v-section:hover{background:rgba(38,38,43,0.6);border-color:rgba(255,255,255,0.1)}
+    .v-title{color:#8a99ad;font-weight:bold;font-size:0.8rem;text-transform:uppercase;margin-bottom:6px;display:block}
+    .v-text{font-size:0.98rem;line-height:1.5;color:#e4e4e7}
+  </style>
+</head>
+<body class="theme-normal">
+<div class="app-container">
+  <div class="box side-column spec-column">
+    <h2>📋 Экспресс-Анализ Железа</h2>
+    <div id="spec-verdict">Введите комплектующие по центру...</div>
+  </div>
+  <div class="box center-column">
+    <h2>🖥️ Техно-Сканер ПК</h2>
+    <div class="input-wrapper">
+      <input type="text" id="cpu-input" placeholder="Процессор (например, Ryzen 5 3600)..." autocomplete="off">
+      <div id="cpu-suggestions" class="suggestions-box"></div>
+    </div>
+    <div class="input-wrapper">
+      <input type="text" id="gpu-input" placeholder="Видеокарта (например, RTX 4070)..." autocomplete="off">
+      <div id="gpu-suggestions" class="suggestions-box"></div>
+    </div>
+    <div class="input-wrapper">
+      <input type="number" id="power-input" placeholder="Мощность БП в Ваттах...">
+    </div>
+    <div class="input-wrapper">
+      <input type="number" id="ram-input" placeholder="Объём оперативной памяти (ГБ)...">
+    </div>
+    <button id="check-btn">Анализировать сборку</button>
+  </div>
+  <div class="box side-column verdict-column">
+    <h2>📊 Экспертный вердикт</h2>
+    <div id="verdict">Ожидание ввода данных...</div>
+  </div>
+</div>
+<script>
+var cpuDatabase = [
+  { name: "Intel Core 2 Duo E8400", tdp: 65, cores: "2 ядра", socket: "LGA775", price: 300, tier: 1 },
+  { name: "Intel Pentium G4560", tdp: 54, cores: "2 ядра / 4 пот.", socket: "LGA1151", price: 1000, tier: 1 },
+  { name: "Intel Core i5-2500K", tdp: 95, cores: "4 ядра", socket: "LGA1155", price: 1500, tier: 2 },
+  { name: "Intel Core i7-2600K", tdp: 95, cores: "4 ядра / 8 пот.", socket: "LGA1155", price: 2500, tier: 2 },
+  { name: "Intel Core i7-3770K", tdp: 77, cores: "4 ядра / 8 пот.", socket: "LGA1155", price: 3200, tier: 2 },
+  { name: "Intel Core i7-4770K", tdp: 84, cores: "4 ядра / 8 пот.", socket: "LGA1150", price: 4000, tier: 3 },
+  { name: "Intel Core i5-9400F", tdp: 65, cores: "6 ядер", socket: "LGA1151v2", price: 6500, tier: 3 },
+  { name: "Intel Core i5-10400F", tdp: 65, cores: "6 ядер / 12 пот.", socket: "LGA1200", price: 7500, tier: 4 },
+  { name: "Intel Core i5-11400F", tdp: 65, cores: "6 ядер / 12 пот.", socket: "LGA1200", price: 9000, tier: 4 },
+  { name: "Intel Core i5-12400F", tdp: 65, cores: "6 ядер / 12 пот.", socket: "LGA1700", price: 11000, tier: 5 },
+  { name: "Intel Core i5-13400F", tdp: 65, cores: "10 ядер / 16 пот.", socket: "LGA1700", price: 16500, tier: 6 },
+  { name: "Intel Core i7-14700K", tdp: 253, cores: "20 ядер / 28 пот.", socket: "LGA1700", price: 44000, tier: 9 },
+  { name: "Intel Core i9-14900K", tdp: 253, cores: "24 ядра / 32 пот.", socket: "LGA1700", price: 58000, tier: 10 },
+  { name: "Intel Core Ultra 7 265K", tdp: 125, cores: "20 ядер", socket: "LGA1851", price: 46000, tier: 9 },
+  { name: "Intel Xeon E5-2670 V3", tdp: 120, cores: "12 ядер / 24 пот.", socket: "LGA2011-3", price: 1500, tier: 3 },
+  { name: "Intel Xeon E5-2666 V3", tdp: 135, cores: "10 ядер / 20 пот.", socket: "LGA2011-3", price: 1200, tier: 3 },
+  { name: "AMD FX-6300", tdp: 95, cores: "6 ядер", socket: "AM3+", price: 1500, tier: 2 },
+  { name: "AMD FX-8350", tdp: 125, cores: "8 ядер", socket: "AM3+", price: 2800, tier: 2 },
+  { name: "AMD Athlon II X4 640", tdp: 95, cores: "4 ядра", socket: "AM3", price: 800, tier: 1 },
+  { name: "AMD Ryzen 5 1600", tdp: 65, cores: "6 / 12", socket: "AM4", price: 4000, tier: 3 },
+  { name: "AMD Ryzen 5 2600", tdp: 65, cores: "6 / 12", socket: "AM4", price: 5000, tier: 3 },
+  { name: "AMD Ryzen 5 3600", tdp: 65, cores: "6 / 12", socket: "AM4", price: 6500, tier: 4 },
+  { name: "AMD Ryzen 5 5600", tdp: 65, cores: "6 / 12", socket: "AM4", price: 9000, tier: 5 },
+  { name: "AMD Ryzen 5 7500F", tdp: 65, cores: "6 / 12", socket: "AM5", price: 13000, tier: 6 },
+  { name: "AMD Ryzen 7 5700X3D", tdp: 105, cores: "8 / 16", socket: "AM4", price: 16000, tier: 7 },
+  { name: "AMD Ryzen 7 7800X3D", tdp: 120, cores: "8 / 16", socket: "AM5", price: 42000, tier: 9 },
+  { name: "AMD Ryzen 7 9800X3D", tdp: 120, cores: "8 / 16", socket: "AM5", price: 55000, tier: 10 }
+];
+
+var gpuDatabase = [
+  { name: "NVIDIA GeForce GT 730", tdp: 49, vram: "2 ГБ", bus: "64-bit", price: 2000, tier: 1 },
+  { name: "NVIDIA GeForce GT 1030", tdp: 30, vram: "2 ГБ", bus: "64-bit", price: 4500, tier: 1 },
+  { name: "NVIDIA GeForce GTX 550 Ti", tdp: 116, vram: "1 ГБ", bus: "192-bit", price: 1500, tier: 1 },
+  { name: "NVIDIA GeForce GTX 750 Ti", tdp: 60, vram: "2 ГБ", bus: "128-bit", price: 3000, tier: 2 },
+  { name: "NVIDIA GeForce GTX 960", tdp: 120, vram: "4 ГБ", bus: "128-bit", price: 4500, tier: 3 },
+  { name: "NVIDIA GeForce GTX 1050 Ti", tdp: 75, vram: "4 ГБ", bus: "128-bit", price: 5500, tier: 3 },
+  { name: "NVIDIA GeForce GTX 1060 6GB", tdp: 120, vram: "6 ГБ", bus: "192-bit", price: 8000, tier: 4 },
+  { name: "NVIDIA GeForce GTX 1660 Super", tdp: 125, vram: "6 ГБ", bus: "192-bit", price: 15000, tier: 4 },
+  { name: "NVIDIA GeForce RTX 2060", tdp: 160, vram: "6 ГБ", bus: "192-bit", price: 18000, tier: 4 },
+  { name: "NVIDIA GeForce RTX 3060 12GB", tdp: 170, vram: "12 ГБ", bus: "192-bit", price: 29000, tier: 5 },
+  { name: "NVIDIA GeForce RTX 4060", tdp: 115, vram: "8 ГБ", bus: "128-bit", price: 34000, tier: 6 },
+  { name: "NVIDIA GeForce RTX 4070", tdp: 200, vram: "12 ГБ", bus: "192-bit", price: 62000, tier: 8 },
+  { name: "NVIDIA GeForce RTX 4070 Super", tdp: 220, vram: "12 ГБ", bus: "192-bit", price: 71000, tier: 9 },
+  { name: "NVIDIA GeForce RTX 4090", tdp: 450, vram: "24 ГБ", bus: "384-bit", price: 210000, tier: 10 },
+  { name: "NVIDIA GeForce RTX 5070", tdp: 250, vram: "12 ГБ GDDR7", bus: "192-bit", price: 85000, tier: 9 },
+  { name: "NVIDIA GeForce RTX 5080", tdp: 400, vram: "16 ГБ GDDR7", bus: "256-bit", price: 140000, tier: 10 },
+  { name: "NVIDIA GeForce RTX 5090", tdp: 600, vram: "32 ГБ GDDR7", bus: "512-bit", price: 290000, tier: 10 },
+  { name: "AMD Radeon RX 580 8GB", tdp: 185, vram: "8 ГБ", bus: "256-bit", price: 6000, tier: 4 },
+  { name: "AMD Radeon RX 6600", tdp: 132, vram: "8 ГБ", bus: "128-bit", price: 24000, tier: 5 },
+  { name: "AMD Radeon RX 7800 XT", tdp: 263, vram: "16 ГБ", bus: "256-bit", price: 56000, tier: 8 }
+];
+function parseCPU(name) {
+  var n = name.toUpperCase();
+  var found = cpuDatabase.find(function(c){return c.name.toLowerCase()===name.toLowerCase().trim();});
+  if (found) return found;
+  var tier = 4, tdp = 65, cores = "6 / 12", socket = "AM4 / LGA1700";
+  if (n.includes("DUO") || n.includes("PENTIUM") || n.includes("ATHLON") || n.includes("E8400") || n.includes("G4560")) { tier = 1; tdp = 65; cores = "2-4 ядра"; socket = "LGA775 / AM3 / LGA1151"; }
+  else if (n.includes("FX") || n.includes("6300") || n.includes("8350") || n.includes("PHENOM") || n.includes("XEON")) { tier = 2; tdp = 125; cores = "6-8 ядер"; socket = "AM3+ / LGA2011-3"; }
+  else if (n.includes("9") || n.includes("X3D") || n.includes("ULTRA 9")) { tier = 9; tdp = 120; cores = "8+ ядер"; }
+  else if (n.includes("7") || n.includes("ULTRA 7")) { tier = 7; tdp = 105; cores = "8 ядер"; }
+  return { name: name, tdp: tdp, cores: cores, socket: socket, price: tier * 4000, tier: tier };
+}
+
+function parseGPU(name) {
+  var n = name.toUpperCase();
+  var found = gpuDatabase.find(function(g){return g.name.toLowerCase()===name.toLowerCase().trim();});
+  if (found) return found;
+  var tier = 5, tdp = 130, vram = "8 ГБ", bus = "128-bit";
+  if (n.includes("GT") || n.includes("730") || n.includes("550") || n.includes("1030")) { tier = 1; tdp = 60; vram = "1-2 ГБ"; bus = "64/128-bit"; }
+  else if (n.includes("750") || n.includes("960") || n.includes("1050")) { tier = 2; tdp = 90; vram = "2-4 ГБ"; bus = "128-bit"; }
+  else if (n.includes("5090") || n.includes("4090")) { tier = 10; tdp = 500; vram = "24 ГБ"; bus = "384-bit"; }
+  else if (n.includes("5080") || n.includes("4080") || n.includes("4070") || n.includes("5070")) { tier = 9; tdp = 250; vram = "12-16 ГБ"; bus = "192/256-bit"; }
+  return { name: name, tdp: tdp, vram: vram, bus: bus, price: tier * 12000, tier: tier };
+}
+
+function initLiveSearch(inputId, boxId, database) {
+  var input = document.getElementById(inputId); var box = document.getElementById(boxId);
+  input.addEventListener("input", function() {
+    var text = input.value.toLowerCase().trim(); box.innerHTML = "";
+    if (text.length < 1) { box.style.display = "none"; return; }
+    var matches = database.filter(function(item) { return item.name.toLowerCase().includes(text); });
+    if (matches.length > 0) {
+      matches.forEach(function(item) {
+        var div = document.createElement("div"); div.className = "suggestion-item";
+        div.innerHTML = "<div class='asst-header'>Найдено в базе</div><div class='asst-name'>" + item.name + "</div><div class='asst-badge'>~ " + item.price.toLocaleString() + " руб.</div>";
+        div.addEventListener("click", function() { input.value = item.name; box.style.display = "none"; });
+        box.appendChild(div);
+      });
+      box.style.display = "block";
+    } else { box.style.display = "none"; }
+  });
+  document.addEventListener("click", function(e) { if (e.target !== input) box.style.display = "none"; });
+}
+initLiveSearch("cpu-input", "cpu-suggestions", cpuDatabase);
+initLiveSearch("gpu-input", "gpu-suggestions", gpuDatabase);
+
+document.getElementById("check-btn").addEventListener("click", function() {
+  var cpuName = document.getElementById("cpu-input").value.trim();
+  var gpuName = document.getElementById("gpu-input").value.trim();
+  var power = parseInt(document.getElementById("power-input").value);
+  var ram = parseInt(document.getElementById("ram-input").value);
+  if (!cpuName || !gpuName || isNaN(power) || isNaN(ram)) { alert("Заполни все поля!"); return; }
+  
+  var cpu = parseCPU(cpuName); var gpu = parseGPU(gpuName);
+  var ramPrice = ram >= 32 ? 9000 : (ram === 16 ? 4500 : 2500);
+  var psuPrice = power >= 1000 ? 15000 : (power >= 750 ? 8000 : 4000);
+  var totalPcPrice = cpu.price + gpu.price + ramPrice + psuPrice + 12000;
+  var totalNetW = cpu.tdp + gpu.tdp + 50; var optimalPsuW = Math.ceil((totalNetW * 1.3) / 50) * 50;
+  var score = 2; var balanceTxt = "", blockRecommendations = ""; var hasIssue = false;
+  var tierDiff = cpu.tier - gpu.tier;
+  
+  if (Math.abs(tierDiff) <= 1) { balanceTxt = "🟢 <b>Идеал.</b> Компоненты сопоставимы по силе."; }
+  else if (tierDiff >= 2) { score = Math.min(score, 1); balanceTxt = "⚠️ <b>Слабая видеокарта!</b> Видеочип не раскрывает процессор."; blockRecommendations += "<div style='margin-top:8px;color:#10ac84;'>🛒 <b>Рекомендуем карту:</b> Сюда отлично встанет RTX 4060 / 4070.</div>"; hasIssue = true; }
+  else { score = Math.min(score, 1); balanceTxt = "🔴 <b>Процессорный ботлнек!</b> Слабый CPU тормозит мощную карту."; blockRecommendations += "<div style='margin-top:8px;color:#10ac84;'>🛒 <b>Рекомендуем проц:</b> Обнови процессор до Ryzen 5 5600 или i5-12400F.</div>"; hasIssue = true; }
+  
+  var upgradeText = "🟢 Сборка сбалансирована, критических замен не требуется.";
+  if (ram < 8) { score = 0; upgradeText = "❌ <b>Катастрофа ОЗУ:</b> Объем меньше 8 ГБ парализует систему."; blockRecommendations += "<div style='margin-top:8px;color:#ee5253;'>🛒 <b>Докупи RAM:</b> Срочно увеличь объем памяти до 16-32 ГБ.</div>"; }
+  if (power < totalNetW) { score = 0; upgradeText = "❌ <b>Замени БП:</b> Мощность " + power + "W ниже критического порога (" + totalNetW + "W)."; blockRecommendations += "<div style='margin-top:8px;color:#ee5253;'>🛒 <b>Замени БП:</b> Нужен рабочий блок от " + optimalPsuW + "W.</div>"; }
+  else if (power < optimalPsuW) { score = Math.min(score, 1); if (upgradeText.indexOf("🟢") === 0) upgradeText = "⚠️ <b>Мало мощности БП:</b> Рекомендуется заменить блок питания для запаса."; blockRecommendations += "<div style='margin-top:8px;color:#0076ff;'>🛒 <b>БП для надежности:</b> Поставь хороший блок на 700W.</div>"; }
+  if (cpu.tier <= 2 && gpu.tier <= 2) { upgradeText = "🎛️ <b>Ретро-сборка:</b> Железо устарело. Локальный апгрейд бессмысленен."; blockRecommendations += "<div style='margin-top:8px;color:#0076ff;'>🛒 <b>Полный ребилд:</b> Копи деньги на сокет AM4 или LGA1700 с нуля.</div>"; }
+  else if (upgradeText.indexOf("🟢") === 0 && hasIssue) { upgradeText = "⚠️ Обнаружен дисбаланс чипов. Проверь рекомендации ниже."; }
+  
+  var performanceText = "";
+  if (cpu.tier >= 8 && gpu.tier >= 9) { performanceText = "🚀 <b>Ультра-гейминг:</b> Любые хиты пойдут на максималках в 2K/4K с лучами."; }
+  else if (cpu.tier >= 4 && gpu.tier >= 5) { performanceText = "🎮 <b>Комфортный средний класс:</b> Спокойно потянет большинство игр в 1080p."; }
+  else { performanceText = "👾 <b>Ретро и классика:</b> Только CS2, Dota 2 на минималках, старые игры до 2018 года, серфинг и фильмы."; }
+  
+  document.getElementById("spec-verdict").innerHTML = 
+    "<div class='v-section'><span class='v-title'>🧠 Процессор</span><div class='v-text'>Сокет: <b>" + cpu.socket + "</b><br>Ядра: <b>" + cpu.cores + "</b><br>TDP: <b>" + cpu.tdp + "W</b></div></div>" +
+    "<div class='v-section'><span class='v-title'>⚡ Видеокарта</span><div class='v-text'>Память: <b>" + gpu.vram + "</b><br>Шина: <b>" + gpu.bus + "</b><br>TDP: <b>" + gpu.tdp + "W</b></div></div>" +
+    "<div class='v-section'><span class='v-title'>🔌 Потребление</span><div class='v-text'>Пик: <b>" + totalNetW + " Вт</b><br>Оптимум БП: <b>" + optimalPsuW + "W</b></div></div>";
+  
+  var rightHTML = 
+    "<div class='v-section'><span class='v-title'>💰 1. Примерная стоимость ПК</span><div class='v-text' style='font-size:1.2rem;color:#10ac84;font-weight:bold;'>~ " + totalPcPrice.toLocaleString() + " рублей</div></div>" +
+    "<div class='v-section'><span class='v-title'>🛠️ 2. Что заменить для улучшения</span><div class='v-text'>" + upgradeText + "</div></div>" +
+    "<div class='v-section'><span class='v-title'>🎮 3. Что потянет эта сборка</span><div class='v-text'>" + performanceText + "</div></div>";
+  if (blockRecommendations !== "") { rightHTML += "<div class='v-section' style='border:1px dashed #0076ff;background:rgba(0,118,255,0.03);'><span class='v-title' style='color:#0076ff;'>📋 Конкретные рекомендации</span>" + blockRecommendations + "</div>"; }
+  document.getElementById("verdict").innerHTML = rightHTML;
+  var body = document.body; body.classList.remove("theme-trash", "theme-normal", "theme-cyber");
+  body.classList.add(score === 0 ? "theme-trash" : (score === 1 ? "theme-normal" : "theme-cyber"));
+});
+</script>
+</body>
+</html>
